@@ -9,6 +9,9 @@ namespace camera
         [SerializeField, Header("メインカメラ")]
         protected Camera mainCamera;
         public Camera MainCamera{get{return mainCamera;}protected set{mainCamera = value;}}
-        protected MoveCamera moveCamera = new MoveCamera();
+        
+        protected MoveCamera moveCameraScript = new MoveCamera();
+
+        protected CameraRotate cameraRotateScript = new CameraRotate();
     }
 }

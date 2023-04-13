@@ -1,0 +1,20 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cf1d2c5a14bd719409028bdacb161a65, type: 3}
+  m_Name: PlayerData
+  m_EditorClassIdentifier: 
+  playerPrefab: {fileID: 4315973718178173373, guid: 8f5b4576f4ecfcf44baef34bd557c19b, type: 3}
+  rotateSpeed: 0.2
+  marchSpeed: 0.2
+  playerRayMaxDirection: 1
+  hitWallJumpPower: 0.25
+  moveDirection: 10

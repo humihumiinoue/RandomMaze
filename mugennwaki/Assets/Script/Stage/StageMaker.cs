@@ -9,58 +9,57 @@ namespace stage
 {
     public class StageMaker : BaseStage
     {
-        private void Start()
+        private void Awake()
         {
-            CreateMaze();
+            initializeMaze();
         }
         
         /// <summary>
         /// 何マスで迷宮を作るか初期宣言・迷宮作成
         /// </summary>
-        private async void CreateMaze()
-        {
-            // 外壁は奇数にすること
-            MazeWidth = 29;
-            MazeHeight = 29;
+        private void initializeMaze()
+        {          
 
-            // 横と縦の半分
-            Centered = new Vector3((MazeWidth >> 1), (MazeHeight >> 1), 0);
+            instanceMaze();
 
-            InitializeMaze();
+            fixedStartDigPos();
 
-            await DigMaze();
+            // ゴール地点の色を赤にする
+            GoalObject.transform.GetChild(1).gameObject.GetComponent<Renderer>().material.color = Color.red;
+
+            // ゴール地点のオブジェクトをゴールとする
+            GoalObject.tag = "Goal";
         }
 
         /// <summary>
         /// 初期設定
         /// </summary>
-        private void InitializeMaze()
+        private void instanceMaze()
         {
-            Maze = new bool[MazeWidth, MazeHeight];
+            StandWall = new bool[BaseScript.MasterStage.DataStageScript.MazeWidth, BaseScript.MasterStage.DataStageScript.MazeHeight];
+
             // 縦・幅分のブロックを用意
-            MazeWallObject = new GameObject[MazeWidth, MazeHeight];
-            for (int i = 0; i < MazeWidth; i++)
+            MazeStageArray = new GameObject[BaseScript.MasterStage.DataStageScript.MazeWidth, BaseScript.MasterStage.DataStageScript.MazeHeight];
+
+            for (int i = 0; i < BaseScript.MasterStage.DataStageScript.MazeWidth; i++)
             {
-                for (int j = 0; j < MazeHeight; j++)
+
+                for (int j = 0; j < BaseScript.MasterStage.DataStageScript.MazeHeight; j++)
                 {
-                // 壁判定を全マスオン
-                    Maze[i, j] = true;
-                // オブジェクトを全マスに生成
-                    MazeWallObject[i, j] = Instantiate(WallPrefab, new Vector3(i, j, 0), Quaternion.identity) as GameObject;
+                    // 壁と床の判定を全マスオン
+                    StandWall[i, j] = true;
+
+                    // オブジェクトを全マスに生成
+                    MazeStageArray[i, j] = Instantiate(StageObject, new Vector3(i, 0, j)
+                    , Quaternion.identity, StageManager.transform) as GameObject;
                 }
             }
-            // 迷路の床の大きさを設定
-            Floor.transform.localScale = new Vector3(MazeWidth, MazeHeight, 1);
-            // 地面は壁より下に配置
-            Vector3 floorPos = Centered + Vector3.forward;
-            // 床を迷路と同じ大きさで真ん中に生成
-            MazeFloorObject = Instantiate(Floor, floorPos, Quaternion.identity) as GameObject;
         }
 
         /// <summary>
         /// スタート地点をランダムに決定
         /// </summary>
-        private async UniTask DigMaze()
+        private void fixedStartDigPos()
         {
             // 横の位置を　0~横幅までの値を返して(Range)    範囲を迷路の端から端に設定
             // iがiのあまり算が0以外の数字を返して(Where)   奇数のみを返す = 外壁の中に生成されるのを防ぐ
@@ -69,51 +68,80 @@ namespace stage
             // 最初の要素を代入First　
             // iはRangeで返ってきた数字が入る　
             // iはreturn iのこと
-            int startPosW = Enumerable.Range(0, MazeWidth).Where(i => (i & 1) != 0).OrderBy(i => Guid.NewGuid()).First();
-            int startPosH = Enumerable.Range(0, MazeHeight).Where(i => (i & 1) != 0).OrderBy(i => Guid.NewGuid()).First();
-            await Dig(new Vector3(startPosW, startPosH, 0));
+            DigStartPosW = Enumerable.Range(0, BaseScript.MasterStage.DataStageScript.MazeWidth)
+            .Where(i => (i & 1) != 0)
+            .OrderBy(i => Guid.NewGuid())
+            .First();
+
+            DigStartPosH = Enumerable.Range(0, BaseScript.MasterStage.DataStageScript.MazeHeight)
+            .Where(i => (i & 1) != 0)
+            .OrderBy(i => Guid.NewGuid())
+            .First();
+
+            // 壁を掘れるかどうか調べる
+            checkHitDigWall(new Vector3(DigStartPosW, DigStartPosH, 0));
         }
 
         /// <summary>
-        /// 壁を掘る
+        /// 壁を掘れるかどうか調べる
         /// </summary>
         /// <param name="point">掘る座標</param>
-        private async UniTask Dig(Vector3 point)
+        private void checkHitDigWall(Vector3 point)
         {
-            await RemoveWall(point);
+            // 壁がない判定にする・非表示にする
+            RemoveWall(point);
+
             // 方向のリストをランダムに並び替える
-            foreach (var dir in searchDirections.OrderBy(i => Guid.NewGuid())){
+            foreach (var dir in fourDirections.OrderBy(i => Guid.NewGuid()))
+            {
                 // 2マス先にブロックがないか調べるための計算
-                var checkPos = point + dir * 2;
+                var checkPos = point + dir + dir;
+
                 // 2マス先にブロックがないか調べる
-                if (IsInBoard(checkPos) && Maze[(int)checkPos.x, (int)checkPos.y])
+                if (checkInMazePos(checkPos) && StandWall[(int)checkPos.x, (int)checkPos.y])
                 {
-                    await RemoveWall(point + dir);
-                    await Dig(checkPos);
+                    // 壁がない判定にする・非表示にする
+                    RemoveWall(point + dir);
+
+                    // 迷宮の内側かどうかを調べる
+                    checkHitDigWall(checkPos);
                 }
             }
+
         }
 
         /// <summary>
-        /// タイミングをずらして掘る
+        /// 壁がない判定にする・非表示にする
         /// </summary>
         /// <param name="point">迷路の座標</param>
-        private async UniTask RemoveWall(Vector3 point)
+        private void RemoveWall(Vector3 point)
         {
-            var w = (int)point.x;
-            var h = (int)point.y;
-            Maze[w, h] = false;
-            MazeWallObject[w, h].SetActive(false);
-            await UniTask.Delay(DIG_TIME);
+            var mazeWidth = (int)point.x;
+            var mazeHeight = (int)point.y;
+
+            // 壁がない判定にする
+            StandWall[mazeWidth, mazeHeight] = false;
+
+            // すでに消えていないか確認
+            if(MazeStageArray[mazeWidth, mazeHeight].transform.GetChild(0).gameObject.activeSelf)
+            {
+                // 非表示にする
+                MazeStageArray[mazeWidth, mazeHeight].transform.GetChild(0).gameObject.SetActive(false);
+                // ゴールオブジェクトを更新
+                GoalObject = MazeStageArray[mazeWidth, mazeHeight];
+            }
         }
 
         /// <summary>
         /// 対象が迷宮の範囲内か調べる
         /// </summary>
         /// <param name="pos">迷宮の範囲内を設定する座標</param>
-        private bool IsInBoard(Vector3 pos)
+        private bool checkInMazePos(Vector3 pos)
         {
-            return pos.x >= 0 && pos.y >= 0 && pos.x < MazeWidth && pos.y < MazeHeight;
+            return pos.x >= 0 
+            && pos.y >= 0 
+            && pos.x < BaseScript.MasterStage.DataStageScript.MazeWidth 
+            && pos.y < BaseScript.MasterStage.DataStageScript.MazeHeight;
         }
     }
 }

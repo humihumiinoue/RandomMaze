@@ -6,11 +6,16 @@ namespace camera
 {
     public class MoveCamera
     {
-        public void SetCamera()
+        public void MoveCameraUpdate()
         {
-            // カメラの位置を設置・全体を見渡す
-            BaseBase.TmpCamera.MainCamera.transform.position = BaseBase.TmpStage.Centered + Vector3.back 
-                                                            * ((BaseBase.TmpStage.MazeWidth + BaseBase.TmpStage.MazeHeight) >> 1);
+            setCamera();
+        }
+
+        // カメラの位置をプレイヤーと同期させる
+        private void setCamera()
+        {
+            BaseScript.MasterCamera.MainCamera.transform.position = 
+            BaseScript.MasterPlayer.PlayerObj.transform.position;
         }
     }
 }
