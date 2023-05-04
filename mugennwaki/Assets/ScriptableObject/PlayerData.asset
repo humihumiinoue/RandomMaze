@@ -18,3 +18,4 @@ MonoBehaviour:
   playerRayMaxDirection: 1
   hitWallJumpPower: 0.25
   moveDirection: 10
+  goToNextStage: 0

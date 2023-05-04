@@ -9,11 +9,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 6ce67708d1db53643b55eaa2ac29fbc9, type: 3}
-  m_Name: StageData
+  m_Script: {fileID: 11500000, guid: 3ac4a791b3147ab46bf0ec6f3d73c7ba, type: 3}
+  m_Name: FadeData
   m_EditorClassIdentifier: 
-  mazeHeight: 15
-  mazeWidth: 15
-  goalSeachDirection: 1
-  waitFadeTimer: 1.5
-  waitStartCount: 3
+  waitFadeTimer: 0.25

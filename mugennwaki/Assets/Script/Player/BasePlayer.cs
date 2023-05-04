@@ -41,16 +41,17 @@ namespace Player
         public bool PlayerMarchFlag{get; set;} = false;
 
         /// <summary>
-        /// プレイヤー当たり判定
-        /// </summary>
-        /// <value></value>
-        public Bounds PlayerGoalBounds{get; set;}
-
-        /// <summary>
         /// プレイヤーが壁にぶつかるアニメーションが発生するかどうかのフラグ
         /// </summary>
         /// <value></value>
         public bool PlayerColWallFlag{get; set;} = false;
+
+        public Vector3 BeforeMovePlayerPos{get; set;}
+
+        /// <summary>
+        /// プレイヤーがゴールした時に移動する距離のクラス
+        /// </summary>
+        public PlayerGoToNextStage NextStageDirection{get; set;}
 
         public enum PlayerMoveState
         {
@@ -63,16 +64,16 @@ namespace Player
         protected PlayerMoveState playerMoveState;
         public PlayerMoveState PlayerMoveStates{get{return playerMoveState;} set{playerMoveState = value;}}
 
-        public InstancePlayer InstancePlayerScript{get; protected set;}
+        public InstancePlayer InstancePlayer{get; protected set;}
 
-        public MovePlayer MovePlayerScript{get; protected set;}
+        public MovePlayer MovePlayer{get; protected set;}
 
-        public PlayerRotate PlayerRotateScript{get; protected set;}
+        public PlayerRotate PlayerRotate{get; protected set;}
 
         [SerializeField]
         private DataPlayer scriptablePlayer;
-        public DataPlayer ScriptablePlayerScript{get{return scriptablePlayer;}}
+        public DataPlayer DataPlayer{get{return scriptablePlayer;}}
 
-        public ColPlayer ColPlayerScript{get; protected set;}
+        public ColPlayer ColPlayer{get; protected set;}
     }
 }

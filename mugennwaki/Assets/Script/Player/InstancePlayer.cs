@@ -12,10 +12,12 @@ namespace Player
         {
             // プレイヤーの初期位置を設定
             BaseScript.MasterPlayer.PlayerDefaultPos
-            = new Vector3(BaseScript.MasterStage.DigStartPosW, 1, BaseScript.MasterStage.DigStartPosH);
+            = new Vector3(BaseScript.MasterStage.DigStartPosW.DigStartPosWidth
+                        , 1
+                        , BaseScript.MasterStage.DigStartPosH.DigStartPosHeight);
 
             // 生成する
-            BaseScript.MasterPlayer.PlayerObj = MonoBehaviour.Instantiate(BaseScript.MasterPlayer.ScriptablePlayerScript.PlayerPrefab
+            BaseScript.MasterPlayer.PlayerObj = MonoBehaviour.Instantiate(BaseScript.MasterPlayer.DataPlayer.PlayerPrefab
             , BaseScript.MasterPlayer.PlayerDefaultPos 
             , Quaternion.identity
             , BaseScript.MasterPlayer.ParentPlayer.transform);

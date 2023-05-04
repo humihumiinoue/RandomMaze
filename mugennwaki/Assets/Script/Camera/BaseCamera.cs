@@ -6,9 +6,7 @@ namespace camera
 {
     public class BaseCamera : MonoBehaviour
     {
-        [SerializeField, Header("メインカメラ")]
-        protected Camera mainCamera;
-        public Camera MainCamera{get{return mainCamera;}protected set{mainCamera = value;}}
+        public Camera MainCamera{get; protected set;}
         
         protected MoveCamera moveCameraScript = new MoveCamera();
 

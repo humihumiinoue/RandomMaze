@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using DG.Tweening;
 
 namespace Player
 {
@@ -8,12 +9,13 @@ namespace Player
     {
         void Awake()
         {
-            InstancePlayerScript = new InstancePlayer();
-            MovePlayerScript = new MovePlayer();
-            PlayerRotateScript = new PlayerRotate();
-            ColPlayerScript = new ColPlayer();
+            DG.Tweening.DOTween.SetTweensCapacity(tweenersCapacity:800, sequencesCapacity:200);
+            InstancePlayer = new InstancePlayer();
+            MovePlayer = new MovePlayer();
+            PlayerRotate = new PlayerRotate();
+            ColPlayer = new ColPlayer();
             // プレイヤー生成
-            InstancePlayerScript.instancePlayer();
+            InstancePlayer.instancePlayer();
         }
 
         // Start is called before the first frame update
@@ -21,8 +23,6 @@ namespace Player
         {
             // 回転フラグをオン
             BaseScript.MasterPlayer.PlayerRotateFlag = true;
-            // 移動フラグをオン
-            BaseScript.MasterPlayer.PlayerMarchFlag = true;
             // 壁に当たった時のアニメーションを再生するフラグをオン
             BaseScript.MasterPlayer.PlayerColWallFlag = true;
         }
@@ -31,11 +31,16 @@ namespace Player
         void Update()
         {
             // 移動
-            MovePlayerScript.MovePlayerUpdate();
+            MovePlayer.MovePlayerUpdate();
             // 回転
-            PlayerRotateScript.PlayerRotateUpdate();
+            PlayerRotate.PlayerRotateUpdate();
             // 当たり判定
-            ColPlayerScript.ColPlayerUpdate();
+            ColPlayer.ColPlayerUpdate();
+        }
+
+        void OnDestroy()
+        {
+            DOTween.KillAll();
         }
     }
 }
