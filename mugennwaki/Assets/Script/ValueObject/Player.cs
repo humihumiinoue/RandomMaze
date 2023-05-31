@@ -29,9 +29,19 @@ namespace valueObject
         public float GoToNextStageDirection{get; private set;}
 
         // コンストラクタ
-        public PlayerGoToNextStage()
+        public PlayerGoToNextStage(float tmpDirection)
         {
-            GoToNextStageDirection = BaseScript.MasterPlayer.DataPlayer.MoveDirection;
+            GoToNextStageDirection = tmpDirection;
+        }
+    }
+
+    public sealed class PlayerGetItem
+    {
+        public int Count{get; private set;}
+
+        public PlayerGetItem(int tmpCount)
+        {
+            Count = tmpCount;
         }
     }
 }

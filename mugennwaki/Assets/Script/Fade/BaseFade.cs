@@ -19,5 +19,8 @@ namespace fade
         public FadeScene FadeScene{get; protected set;}
 
         public FadeTimer FadeTimer{get; protected set;}
+        
+        private static BaseFade masterFade;
+        public static BaseFade MasterFade{get{return masterFade;} set{masterFade = value;}}
     }
 }

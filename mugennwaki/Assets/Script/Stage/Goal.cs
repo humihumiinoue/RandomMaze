@@ -5,7 +5,11 @@ using UnityEngine.SceneManagement;
 using Cysharp.Threading.Tasks;
 using System;
 using valueObject;
-using DG.Tweening;
+using stage;
+using Player;
+using fade;
+using item;
+using particle;
 
 namespace goal
 {
@@ -17,67 +21,96 @@ namespace goal
         }
 
         // プレイヤーがゴールしたら次のステージへ
-        private void goNextStage()
+        private async void goNextStage()
         {
             RaycastHit hit;
 
-            // ゴールオブジェクトにプレイヤーが乗ったら
-            if(Physics.Raycast(BaseScript.MasterStage.GoalObject.transform.position,
-                            BaseScript.MasterStage.GoalObject.transform.up,
+            // ゴールオブジェクトにプレイヤーが乗ったら　・　アイテムをすべて回収したら
+            if(Physics.Raycast(BaseStage.MasterStage.GoalObject.transform.position,
+                            BaseStage.MasterStage.GoalObject.transform.up,
                             out hit,
-                            BaseScript.MasterStage.DataStageScript.GoalSeachDirection))
+                            BaseStage.MasterStage.DataStageScript.GoalSeachDirection)
+
+                && BasePlayer.MasterPlayer.PlayerGetItem.Count ==
+                BaseItem.MasterItem.OverLImit.Number)
             {
+                // 獲得数を初期化
+                BasePlayer.MasterPlayer.PlayerGetItem = new valueObject.PlayerGetItem(0);
+
                 // ステージクリア後挙動開始フラグ
-                BaseScript.MasterStage.StageClearFlag = true;
+                BaseStage.MasterStage.StageClearFlag = true;
 
                 // 移動と回転を防ぐ
-                BaseScript.MasterPlayer.PlayerRotateFlag = false;
-                BaseScript.MasterPlayer.PlayerColWallFlag = false;
+                BasePlayer.MasterPlayer.PlayerRotateFlag = false;
+                BasePlayer.MasterPlayer.PlayerColWallFlag = false;
                 
                 // 暗転する
-                BaseScript.MasterFade.FadeScene.FadeOutStage();
+                BaseFade.MasterFade.FadeScene.FadeOutStage();
 
-                // 遅延処理
-                DOVirtual.DelayedCall(BaseScript.MasterFade.DataFade.WaitFadeTimer,() =>
-                {
-                    // スタート位置を再設定
-                    BaseScript.MasterPlayer.PlayerObj.transform.position =
-                    BaseScript.MasterPlayer.PlayerDefaultPos;
+                // 暗転するまで遅延
+                await UniTask.Delay((int)(BaseFade.MasterFade.DataFade.WaitFadeTimer * 1000));
 
-                    // 初めてクリアした
-                    if(BaseScript.MasterStage.StageChalengeCount == null)
-                    {
-                        // クリアしたカウントを記録
-                        BaseScript.MasterStage.StageChalengeCount = new StageChalengeCount(1);
-                    }
-                    else
-                    {
-                        // 二回目以降のクリアでクリア回数 + 1
-                        BaseScript.MasterStage.StageChalengeCount = 
-                        new StageChalengeCount(BaseScript.MasterStage.StageChalengeCount.StageCount + 1);
-                    }
-                    
-                    if(BaseScript.MasterStage.StageClearFlag)
-                    {
-                        // 迷路再生成
-                        BaseScript.MasterStage.MakeStage.initializeMaze();
-                        BaseScript.MasterStage.StageClearFlag = false;
-                    }
-                    
-                    // 明転する
-                    BaseScript.MasterFade.FadeScene.FadeInStage();
+                // ゴールの光を止める
+                BaseParticle.MasterParticle.Play.GoalRightStop();
 
-                    // 遅延処理
-                    DOVirtual.DelayedCall(BaseScript.MasterFade.DataFade.WaitFadeTimer,() =>
-                {
-                    // 行動可能にする
-                    BaseScript.MasterPlayer.PlayerRotateFlag = true;
-                    BaseScript.MasterPlayer.PlayerColWallFlag = true;
-                    // ステージクリア後挙動開始フラグ
-                    BaseScript.MasterStage.StageClearFlag = false;
-                } , false);
-                } , false);
-                    
+                // アイテム所持数を初期化
+                BasePlayer.MasterPlayer.PlayerGetItem = new PlayerGetItem(0);
+
+                // クリアした回数を数える
+                incrementCrearCount();
+                
+
+                // ステージを再生成する
+                reinstanceStage();
+
+                // スタート位置を再設定
+                BasePlayer.MasterPlayer.PlayerObj.transform.position =
+                BasePlayer.MasterPlayer.PlayerDefaultPos;
+
+                
+
+                // アイテムを再配置する
+                BaseItem.MasterItem.PlaceMent.Again();
+
+                // ゴールの位置に光を配置
+                BaseParticle.MasterParticle.GoalLight.transform.position = BaseStage.MasterStage.GoalObject.transform.position;
+
+                // ゴールに光りを刺す
+                BaseParticle.MasterParticle.Play.GoalRightPlaye();
+                
+                // 明転する
+                BaseFade.MasterFade.FadeScene.FadeInStage();
+
+                
+                // 行動可能にする
+                BasePlayer.MasterPlayer.PlayerRotateFlag = true;
+                BasePlayer.MasterPlayer.PlayerColWallFlag = true;
+                
+                // ステージクリア後挙動開始フラグ
+                BaseStage.MasterStage.StageClearFlag = false;
+                
+            }
+        }
+
+        private void incrementCrearCount()
+        {
+            
+            // 二回目以降のクリアでクリア回数 + 1
+            BaseStage.MasterStage.StageChalengeCount = 
+            new StageChalengeCount(BaseStage.MasterStage.StageChalengeCount.StageCount + 1);
+            
+        }
+
+        // 再生成まとめ
+        private void reinstanceStage()
+        {
+            if(BaseStage.MasterStage.StageClearFlag)
+            {
+                // 迷路再生成
+                BaseStage.MasterStage.MakeStage.initializeMaze();
+
+                // 複数回生成されるのを防ぐ
+                BaseStage.MasterStage.StageClearFlag = false;
             }
         }
 

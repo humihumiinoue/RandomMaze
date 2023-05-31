@@ -4,6 +4,8 @@ using UnityEngine;
 using data;
 using valueObject;
 using goal;
+using DG.Tweening;
+using UnityEngine.UI;
 
 namespace stage
 {
@@ -17,6 +19,10 @@ namespace stage
         [SerializeField, Header("壁と床オブジェクトのまとめ親の親")]
         protected GameObject stageManager;
         public GameObject StageManager{get{return stageManager;}}
+
+        [SerializeField, Header("スコア表示")]
+        private Text scoreText;
+        public Text ScoreText{get{return scoreText;} set{scoreText = value;}}
 
 
         /// <summary>
@@ -80,7 +86,8 @@ namespace stage
         /// <summary>
         /// ステージクリア後挙動開始フラグ
         /// </summary>
-        public bool StageClearFlag;
+        private bool stageClearFlag;
+        public bool StageClearFlag{get{return stageClearFlag;} set{stageClearFlag = value;}}
 
         /// <summary>
         /// 上下左右
@@ -101,5 +108,13 @@ namespace stage
         public MakeStage MakeStage{get; protected set;}
 
         public Goal Goal{get; protected set;}
+        
+        private static BaseStage masterStage;
+        public static BaseStage MasterStage{get{return masterStage;} set{masterStage = value;}}
+
+        public void OnDestroy()
+        {
+            DOTween.KillAll();
+        }
     }
 }

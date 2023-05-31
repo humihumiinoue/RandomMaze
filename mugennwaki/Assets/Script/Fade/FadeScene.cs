@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using DG.Tweening;
+using fade;
 
 namespace fade
 {
@@ -9,12 +10,12 @@ namespace fade
     {
         public void FadeOutStage()
         {
-            BaseScript.MasterFade.FadePanel.DOFade(255, BaseScript.MasterFade.DataFade.WaitFadeTimer);
+            BaseFade.MasterFade.FadePanel.DOFade(255, BaseFade.MasterFade.DataFade.WaitFadeTimer);
         }
 
         public void FadeInStage()
         {
-            BaseScript.MasterFade.FadePanel.DOFade(0, BaseScript.MasterFade.DataFade.WaitFadeTimer);
+            BaseFade.MasterFade.FadePanel.DOFade(0, BaseFade.MasterFade.DataFade.WaitFadeTimer);
         }
     }
 }

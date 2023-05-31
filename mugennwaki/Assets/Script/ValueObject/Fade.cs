@@ -18,9 +18,9 @@ namespace valueObject
         public float StageClearFadeTimer{get; private set;}
 
         // コンストラクタ
-        public FadeTimer()
+        public FadeTimer(float tmpTimer)
         {
-            StageClearFadeTimer = BaseScript.MasterFade.DataFade.WaitFadeTimer;
+            StageClearFadeTimer = tmpTimer;
         }
     }
 }

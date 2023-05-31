@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using president;
 
 namespace stage
 {
@@ -19,14 +20,17 @@ namespace stage
             fixedStartDigPos();
 
             // 初期色を登録
-            BaseScript.MasterStage.FloorDefaultColor =
-            BaseScript.MasterStage.GoalObject.transform.GetChild(1).gameObject.GetComponent<Renderer>().material.color;
+            BaseStage.MasterStage.FloorDefaultColor =
+            BaseStage.MasterStage.GoalObject.transform.GetChild(1).gameObject.GetComponent<Renderer>().material.color;
 
             // ゴール地点の色を赤にする
-            BaseScript.MasterStage.GoalObject.transform.GetChild(1).gameObject.GetComponent<Renderer>().material.color = Color.red;
+            BaseStage.MasterStage.GoalObject.transform.GetChild(1).gameObject.GetComponent<Renderer>().material.color = Color.red;
 
             // ゴール地点のオブジェクトをゴールとする
-            BaseScript.MasterStage.GoalObject.transform.GetChild(1).tag = "Goal";
+            BaseStage.MasterStage.GoalObject.transform.GetChild(1).tag = "Goal";
+
+            // メインゲームにステートを変える
+            BaseGame.MasterGame.Phase = BaseGame.GameState.Game;
         }
 
         /// <summary>
@@ -37,7 +41,7 @@ namespace stage
             
 
             // ゲーム起動時は生成・クリア時はアクティブ化
-            if(BaseScript.MasterStage.StageChalengeCount == null)
+            if(BaseStage.MasterStage.StageChalengeCount.StageCount == 0)
             {
                 // 迷宮生成用・ゲーム開始時のみ作用
                 StageInstance();
@@ -45,54 +49,57 @@ namespace stage
             else
             {
                 // 迷宮全マスに対して
-                for (int i = 0; i < BaseScript.MasterStage.MazeSizeX.SizeX; i++)
+                for (int i = 0; i < BaseStage.MasterStage.MazeSizeX.SizeX; i++)
                 {
 
-                    for (int j = 0; j < BaseScript.MasterStage.MazeSizeY.SizeY; j++)
+                    for (int j = 0; j < BaseStage.MasterStage.MazeSizeY.SizeY; j++)
                     {
                         // 非アクティブなところだけアクティブ化
-                        if(!BaseScript.MasterStage.MazeStageArray[i, j].transform.GetChild(0).gameObject.activeSelf)
+                        if(!BaseStage.MasterStage.MazeStageArray[i, j].transform.GetChild(0).gameObject.activeSelf)
                         {
-                            BaseScript.MasterStage.MazeStageArray[i, j].transform.GetChild(0).gameObject.SetActive(true);
+                            BaseStage.MasterStage.MazeStageArray[i, j].transform.GetChild(0).gameObject.SetActive(true);
                             
                             // 壁と床の判定を全マスオン
-                            BaseScript.MasterStage.StandWall[i, j] = true;
+                            BaseStage.MasterStage.StandWall[i, j] = true;
                             
                         }
                     }
                 }
-                    // ゴール地点のオブジェクトをただの床にする
-                    BaseScript.MasterStage.GoalObject.transform.GetChild(1).tag = "Floor";
-                    // ゴール地点の色を元の色にする
-                    BaseScript.MasterStage.GoalObject.transform.GetChild(1).gameObject.GetComponent<Renderer>().material.color = 
-                    BaseScript.MasterStage.FloorDefaultColor;
+
+                // ゴール地点のオブジェクトをただの床にする
+                BaseStage.MasterStage.GoalObject.transform.GetChild(1).tag = "Floor";
+                // ゴール地点の色を元の色にする
+                BaseStage.MasterStage.GoalObject.transform.GetChild(1).gameObject.GetComponent<Renderer>().material.color = 
+                BaseStage.MasterStage.FloorDefaultColor;
+
+                
             }
         }
 
         // 迷宮生成用・ゲーム開始時のみ作用
         private void StageInstance()
         {
-            BaseScript.MasterStage.StandWall = new bool[BaseScript.MasterStage.MazeSizeX.SizeX, 
-                                                        BaseScript.MasterStage.MazeSizeY.SizeY];
+            BaseStage.MasterStage.StandWall = new bool[BaseStage.MasterStage.MazeSizeX.SizeX, 
+                                                        BaseStage.MasterStage.MazeSizeY.SizeY];
 
             // 縦・幅分のブロックを用意
-            BaseScript.MasterStage.MazeStageArray = new GameObject[BaseScript.MasterStage.MazeSizeX.SizeX, 
-                                                                   BaseScript.MasterStage.MazeSizeY.SizeY];
+            BaseStage.MasterStage.MazeStageArray = new GameObject[BaseStage.MasterStage.MazeSizeX.SizeX, 
+                                                                   BaseStage.MasterStage.MazeSizeY.SizeY];
 
-            for (int i = 0; i < BaseScript.MasterStage.MazeSizeX.SizeX; i++)
+            for (int i = 0; i < BaseStage.MasterStage.MazeSizeX.SizeX; i++)
             {
 
-                for (int j = 0; j < BaseScript.MasterStage.MazeSizeY.SizeY; j++)
+                for (int j = 0; j < BaseStage.MasterStage.MazeSizeY.SizeY; j++)
                 {
                     // 壁と床の判定を全マスオン
-                    BaseScript.MasterStage.StandWall[i, j] = true;
+                    BaseStage.MasterStage.StandWall[i, j] = true;
 
                     // オブジェクトを全マスに生成
-                    BaseScript.MasterStage.MazeStageArray[i, j] = MonoBehaviour.Instantiate(
-                                                                BaseScript.MasterStage.StageObject, 
+                    BaseStage.MasterStage.MazeStageArray[i, j] = MonoBehaviour.Instantiate(
+                                                                BaseStage.MasterStage.StageObject, 
                                                                 new Vector3(i, 0, j), 
                                                                 Quaternion.identity, 
-                                                                BaseScript.MasterStage.StageManager.transform) as GameObject;
+                                                                BaseStage.MasterStage.StageManager.transform) as GameObject;
                 }
             }
         }
@@ -103,21 +110,21 @@ namespace stage
         private void fixedStartDigPos()
         {
             // スタート位置をランダムに決定
-            BaseScript.MasterStage.DigStartPosW = new valueObject.DigStartPosW
-            (Enumerable.Range(0, BaseScript.MasterStage.MazeSizeX.SizeX)
+            BaseStage.MasterStage.DigStartPosW = new valueObject.DigStartPosW
+            (Enumerable.Range(0, BaseStage.MasterStage.MazeSizeX.SizeX)
             .Where(i => (i & 1) != 0)
             .OrderBy(i => Guid.NewGuid())
             .First());
 
-            BaseScript.MasterStage.DigStartPosH = new valueObject.DigStartPosH 
-            (Enumerable.Range(0, BaseScript.MasterStage.MazeSizeY.SizeY)
+            BaseStage.MasterStage.DigStartPosH = new valueObject.DigStartPosH 
+            (Enumerable.Range(0, BaseStage.MasterStage.MazeSizeY.SizeY)
             .Where(i => (i & 1) != 0)
             .OrderBy(i => Guid.NewGuid())
             .First());
 
             // 壁を掘れるかどうか調べる
-            checkHitDigWall(new Vector3(BaseScript.MasterStage.DigStartPosW.DigStartPosWidth, 
-                                        BaseScript.MasterStage.DigStartPosH.DigStartPosHeight, 
+            checkHitDigWall(new Vector3(BaseStage.MasterStage.DigStartPosW.DigStartPosWidth, 
+                                        BaseStage.MasterStage.DigStartPosH.DigStartPosHeight, 
                                         0));
         }
 
@@ -131,13 +138,13 @@ namespace stage
             RemoveWall(point);
 
             // 方向のリストをランダムに並び替える
-            foreach (var dir in BaseScript.MasterStage.fourDirections.OrderBy(i => Guid.NewGuid()))
+            foreach (var dir in BaseStage.MasterStage.fourDirections.OrderBy(i => Guid.NewGuid()))
             {
                 // 2マス先にブロックがないか調べるための計算
                 var checkPos = point + dir + dir;
 
                 // 2マス先にブロックがないか調べる
-                if (checkInMazePos(checkPos) && BaseScript.MasterStage.StandWall[(int)checkPos.x, (int)checkPos.y])
+                if (checkInMazePos(checkPos) && BaseStage.MasterStage.StandWall[(int)checkPos.x, (int)checkPos.y])
                 {
                     // 壁がない判定にする・非表示にする
                     RemoveWall(point + dir);
@@ -159,15 +166,15 @@ namespace stage
             var mazeHeight = (int)point.y;
 
             // 壁がない判定にする
-            BaseScript.MasterStage.StandWall[mazeWidth, mazeHeight] = false;
+            BaseStage.MasterStage.StandWall[mazeWidth, mazeHeight] = false;
 
             // すでに消えていないか確認
-            if(BaseScript.MasterStage.MazeStageArray[mazeWidth, mazeHeight].transform.GetChild(0).gameObject.activeSelf)
+            if(BaseStage.MasterStage.MazeStageArray[mazeWidth, mazeHeight].transform.GetChild(0).gameObject.activeSelf)
             {
                 // 非表示にする
-                BaseScript.MasterStage.MazeStageArray[mazeWidth, mazeHeight].transform.GetChild(0).gameObject.SetActive(false);
+                BaseStage.MasterStage.MazeStageArray[mazeWidth, mazeHeight].transform.GetChild(0).gameObject.SetActive(false);
                 // ゴールオブジェクトを更新
-                BaseScript.MasterStage.GoalObject = BaseScript.MasterStage.MazeStageArray[mazeWidth, mazeHeight];
+                BaseStage.MasterStage.GoalObject = BaseStage.MasterStage.MazeStageArray[mazeWidth, mazeHeight];
             }
         }
 
@@ -179,8 +186,8 @@ namespace stage
         {
             return pos.x >= 0 
             && pos.y >= 0 
-            && pos.x < BaseScript.MasterStage.MazeSizeX.SizeX
-            && pos.y < BaseScript.MasterStage.MazeSizeY.SizeY;
+            && pos.x < BaseStage.MasterStage.MazeSizeX.SizeX
+            && pos.y < BaseStage.MasterStage.MazeSizeY.SizeY;
         }
     }
 

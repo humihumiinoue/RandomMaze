@@ -21,8 +21,7 @@ namespace Player
         /// <summary>
         /// 移動速度
         /// </summary>
-        /// <value></value>
-        public PlayerRunSpeed PlayerRunSpeed_Z;
+        public PlayerRunSpeed PlayerRunSpeed_Z{get; set;}
 
         /// <summary>
         /// プレイヤーの初期位置
@@ -53,6 +52,9 @@ namespace Player
         /// </summary>
         public PlayerGoToNextStage NextStageDirection{get; set;}
 
+
+        public PlayerGetItem PlayerGetItem{get; set;}
+
         public enum PlayerMoveState
         {
             STOP,
@@ -74,6 +76,11 @@ namespace Player
         private DataPlayer scriptablePlayer;
         public DataPlayer DataPlayer{get{return scriptablePlayer;}}
 
-        public ColPlayer ColPlayer{get; protected set;}
+        private ColPlayer colPlayer;
+        public ColPlayer ColPlayer{get{return colPlayer;} set{colPlayer = value;}}
+
+        
+        private static BasePlayer masterPlayer;
+        public static BasePlayer MasterPlayer{get{return masterPlayer;} set{masterPlayer = value;}}
     }
 }

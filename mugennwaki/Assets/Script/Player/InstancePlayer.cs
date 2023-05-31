@@ -11,16 +11,16 @@ namespace Player
         public void instancePlayer()
         {
             // プレイヤーの初期位置を設定
-            BaseScript.MasterPlayer.PlayerDefaultPos
-            = new Vector3(BaseScript.MasterStage.DigStartPosW.DigStartPosWidth
+            BasePlayer.MasterPlayer.PlayerDefaultPos
+            = new Vector3(BaseStage.MasterStage.DigStartPosW.DigStartPosWidth
                         , 1
-                        , BaseScript.MasterStage.DigStartPosH.DigStartPosHeight);
+                        , BaseStage.MasterStage.DigStartPosH.DigStartPosHeight);
 
             // 生成する
-            BaseScript.MasterPlayer.PlayerObj = MonoBehaviour.Instantiate(BaseScript.MasterPlayer.DataPlayer.PlayerPrefab
-            , BaseScript.MasterPlayer.PlayerDefaultPos 
+            BasePlayer.MasterPlayer.PlayerObj = MonoBehaviour.Instantiate(BasePlayer.MasterPlayer.DataPlayer.PlayerPrefab
+            , BasePlayer.MasterPlayer.PlayerDefaultPos 
             , Quaternion.identity
-            , BaseScript.MasterPlayer.ParentPlayer.transform);
+            , BasePlayer.MasterPlayer.ParentPlayer.transform);
         }
     }
 }

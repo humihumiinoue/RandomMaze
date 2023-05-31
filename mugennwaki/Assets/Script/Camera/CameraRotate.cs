@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Player;
 
 namespace camera
 {
@@ -14,8 +15,8 @@ namespace camera
         // カメラの向きをプレイヤーと同期させる
         private void rotateCamera()
         {
-            BaseScript.MasterCamera.MainCamera.transform.eulerAngles =
-            BaseScript.MasterPlayer.PlayerObj.transform.eulerAngles;
+            Camera.main.transform.eulerAngles =
+            BasePlayer.MasterPlayer.PlayerObj.transform.eulerAngles;
         }
     }
 }

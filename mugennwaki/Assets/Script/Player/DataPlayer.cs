@@ -31,10 +31,6 @@ namespace data
         private int moveDirection;
         public int MoveDirection{get{return moveDirection;}}
 
-        [SerializeField, Header("次のステージに向かう移動距離")]
-        private float goToNextStage;
-        public float GoToNextStage{get{return goToNextStage;}}
-
     }
 }
 

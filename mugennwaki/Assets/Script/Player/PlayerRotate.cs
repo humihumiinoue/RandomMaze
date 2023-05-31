@@ -17,7 +17,7 @@ namespace Player
         private void lookSidePlayer()
         {
             // 向いている方向
-            Vector3 playerDefaultRotate = BaseScript.MasterPlayer.PlayerObj.transform.eulerAngles;
+            Vector3 playerDefaultRotate = BasePlayer.MasterPlayer.PlayerObj.transform.eulerAngles;
 
             // 回転方向と大きさ　四方向なので90
             Vector3 playerLeftRotateValue = new Vector3(0, Mathf.RoundToInt(playerDefaultRotate.y - 90), 0);
@@ -57,27 +57,27 @@ namespace Player
         /// <param name="rotateValue">回転量はどれくらいか</param>
         private void rotatePlayer(Vector3 rotateValue)
         {
-            if(BaseScript.MasterPlayer.PlayerRotateFlag)
+            if(BasePlayer.MasterPlayer.PlayerRotateFlag)
             {
                 // 回転する
-                BaseScript.MasterPlayer.PlayerObj.transform.DORotate(
+                BasePlayer.MasterPlayer.PlayerObj.transform.DORotate(
                       rotateValue
-                    , BaseScript.MasterPlayer.DataPlayer.RotateSpeed
+                    , BasePlayer.MasterPlayer.DataPlayer.RotateSpeed
                     , RotateMode.Fast
                 )
                 .OnStart(() =>
                 {
                     // 連打防止・回転中の回転禁止
-                    BaseScript.MasterPlayer.PlayerRotateFlag = false;
+                    BasePlayer.MasterPlayer.PlayerRotateFlag = false;
                     // 移動できなくする
-                    BaseScript.MasterPlayer.PlayerMarchFlag = false;
+                    BasePlayer.MasterPlayer.PlayerMarchFlag = false;
                 })
                 .OnComplete(() =>
                 {
                     // 回転可能にする
-                    BaseScript.MasterPlayer.PlayerRotateFlag = true;
+                    BasePlayer.MasterPlayer.PlayerRotateFlag = true;
                     // 移動可能にする
-                    BaseScript.MasterPlayer.PlayerMarchFlag = true;
+                    BasePlayer.MasterPlayer.PlayerMarchFlag = true;
                 });
             }
         }

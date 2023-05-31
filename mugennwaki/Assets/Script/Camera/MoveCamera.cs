@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Player;
 
 namespace camera
 {
@@ -14,8 +15,8 @@ namespace camera
         // カメラの位置をプレイヤーと同期させる
         private void setCamera()
         {
-            BaseScript.MasterCamera.MainCamera.transform.position = 
-            BaseScript.MasterPlayer.PlayerObj.transform.position;
+            Camera.main.transform.position = 
+                BasePlayer.MasterPlayer.PlayerObj.transform.localPosition;
         }
     }
 }

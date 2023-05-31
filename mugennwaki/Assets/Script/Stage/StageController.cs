@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using goal;
+using fade;
 
 namespace stage
 {
@@ -9,19 +10,22 @@ namespace stage
     {
         void Awake()
         {
+
+            MasterStage = this.GetComponent<BaseStage>();
+
             Goal = new Goal();
             MakeStage = new MakeStage();
-            FadeTimer = new valueObject.FadeTimer();
-            StartWaitCount = new valueObject.StartWaitCount(BaseScript.MasterStage.DataStageScript.WaitStartCount);
-            MazeSizeX = new valueObject.MazeSizeX(BaseScript.MasterStage.DataStageScript.MazeWidth);
-            MazeSizeY = new valueObject.MazeSizeY(BaseScript.MasterStage.DataStageScript.MazeHeight);
+            StartWaitCount = new valueObject.StartWaitCount(MasterStage.DataStageScript.WaitStartCount);
+            MazeSizeX = new valueObject.MazeSizeX(MasterStage.DataStageScript.MazeWidth);
+            MazeSizeY = new valueObject.MazeSizeY(MasterStage.DataStageScript.MazeHeight);
+            StageChalengeCount = new valueObject.StageChalengeCount(0);
 
-            BaseScript.MasterStage.MakeStage.initializeMaze();
+            MasterStage.MakeStage.initializeMaze();
         }
 
         void Update()
         {
-            BaseScript.MasterStage.Goal.GoalUpdate();
+            MasterStage.Goal.GoalUpdate();
         }
     }
 }

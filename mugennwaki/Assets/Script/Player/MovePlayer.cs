@@ -2,11 +2,14 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using DG.Tweening;
+using stage;
 
 namespace Player
 {
     public class MovePlayer
     {
+
+
 
         /// <summary>
         /// 移動系関数まとめ
@@ -19,7 +22,7 @@ namespace Player
             // プレイヤーの移動量を計測
             getPlayerMoveSpeed();
 
-            if(!BaseScript.MasterStage.StageClearFlag)
+            if(!BaseStage.MasterStage.StageClearFlag)
             {
                 // 移動可能かどうか
                 moveFlagCheck();
@@ -32,12 +35,12 @@ namespace Player
         /// </summary>
         private void getPlayerMoveSpeed()
         {
-            BaseScript.MasterPlayer.PlayerRunSpeed_Z = new valueObject.PlayerRunSpeed(Input.GetAxis("Vertical"));
+            BasePlayer.MasterPlayer.PlayerRunSpeed_Z = new valueObject.PlayerRunSpeed(Input.GetAxis("Vertical"));
 
             // 後退禁止
-            if(BaseScript.MasterPlayer.PlayerRunSpeed_Z.playerRunSpeedAmount < 0)
+            if(BasePlayer.MasterPlayer.PlayerRunSpeed_Z.playerRunSpeedAmount < 0)
             {
-                BaseScript.MasterPlayer.PlayerRunSpeed_Z = new valueObject.PlayerRunSpeed(0);
+                BasePlayer.MasterPlayer.PlayerRunSpeed_Z = new valueObject.PlayerRunSpeed(0);
             }
         }
 
@@ -47,9 +50,9 @@ namespace Player
         public void moveFlagCheck()
         {
             // 移動終了後に移動可能にする
-            if(BaseScript.MasterPlayer.PlayerRunSpeed_Z.playerRunSpeedAmount == 0)
+            if(BasePlayer.MasterPlayer.PlayerRunSpeed_Z.playerRunSpeedAmount == 0)
             {
-                BaseScript.MasterPlayer.PlayerMarchFlag = true;
+                BasePlayer.MasterPlayer.PlayerMarchFlag = true;
             }
         }
 
@@ -57,26 +60,28 @@ namespace Player
         // プレイヤーを移動させる
         private void playerMove()
         {
-            BaseScript.MasterPlayer.BeforeMovePlayerPos = BaseScript.MasterPlayer.PlayerObj.transform.localPosition;
+            BasePlayer.MasterPlayer.BeforeMovePlayerPos = BasePlayer.MasterPlayer.PlayerObj.transform.localPosition;
 
             // 特定のボタンを押したかどうか
             if(Input.GetKey(KeyCode.W) || Input.GetKey(KeyCode.UpArrow))
             {                
                 // 前回の移動が終了したかどうか　接地しているかどうか
-                if(BaseScript.MasterPlayer.PlayerMarchFlag
-                && BaseScript.MasterPlayer.PlayerColWallFlag)
+                if(BasePlayer.MasterPlayer.PlayerMarchFlag
+                && BasePlayer.MasterPlayer.PlayerColWallFlag)
                 {
                     // 1マスずつ前進する
-                    BaseScript.MasterPlayer.PlayerObj.transform.DOMove(
-                        BaseScript.MasterPlayer.PlayerObj.transform.forward,
-                        BaseScript.MasterPlayer.DataPlayer.MarchSpeed,
+                    BasePlayer.MasterPlayer.PlayerObj.transform.DOMove(
+                        BasePlayer.MasterPlayer.PlayerObj.transform.forward,
+                        BasePlayer.MasterPlayer.DataPlayer.MarchSpeed,
                         false)
                     // 現在位置からの座標を参照
                     .SetRelative(true)
                     .OnStart(() =>
                     {
                         // 連打防止用
-                        BaseScript.MasterPlayer.PlayerMarchFlag = false;
+                        BasePlayer.MasterPlayer.PlayerMarchFlag = false;
+                        // 移動中の回転を禁止
+                        BasePlayer.MasterPlayer.PlayerRotateFlag = false;
                     })
                     .OnComplete(() =>
                     {
@@ -84,7 +89,8 @@ namespace Player
                         RoundToInt();
 
                         // 移動フラグをオン
-                        BaseScript.MasterPlayer.PlayerMarchFlag = true;
+                        BasePlayer.MasterPlayer.PlayerMarchFlag = true;
+                        BasePlayer.MasterPlayer.PlayerRotateFlag = true;
                     })
                     .SetAutoKill(false);
                 }
@@ -94,13 +100,13 @@ namespace Player
         // 壁に向かって歩く
         public void HitWall()
         {
-            BaseScript.MasterPlayer.BeforeMovePlayerPos = BaseScript.MasterPlayer.PlayerObj.transform.localPosition;
+            BasePlayer.MasterPlayer.BeforeMovePlayerPos = BasePlayer.MasterPlayer.PlayerObj.transform.localPosition;
 
             // 壁に進む
-            BaseScript.MasterPlayer.PlayerObj.transform.DOMove(
-                BaseScript.MasterPlayer.PlayerObj.transform.forward 
-                / BaseScript.MasterPlayer.DataPlayer.MoveDirection
-                , BaseScript.MasterPlayer.DataPlayer.MarchSpeed
+            BasePlayer.MasterPlayer.PlayerObj.transform.DOMove(
+                BasePlayer.MasterPlayer.PlayerObj.transform.forward 
+                / BasePlayer.MasterPlayer.DataPlayer.MoveDirection
+                , BasePlayer.MasterPlayer.DataPlayer.MarchSpeed
                 , false
             )
             // 現在位置から移動
@@ -110,7 +116,7 @@ namespace Player
             .OnStart(() => 
             {
                 // 壁に当たって跳ね返るアニメーションのフラグをオフ
-                BaseScript.MasterPlayer.PlayerColWallFlag = false;
+                BasePlayer.MasterPlayer.PlayerColWallFlag = false;
             })
             .OnComplete(() =>
             {
@@ -124,12 +130,12 @@ namespace Player
         {
 
             // 壁にぶつかって後ろにはじかれる
-            BaseScript.MasterPlayer.PlayerObj.transform.DOJump(
-                -BaseScript.MasterPlayer.PlayerObj.transform.forward /
-                BaseScript.MasterPlayer.DataPlayer.MoveDirection,
-                BaseScript.MasterPlayer.DataPlayer.HitWallJumpPower,
+            BasePlayer.MasterPlayer.PlayerObj.transform.DOJump(
+                -BasePlayer.MasterPlayer.PlayerObj.transform.forward /
+                BasePlayer.MasterPlayer.DataPlayer.MoveDirection,
+                BasePlayer.MasterPlayer.DataPlayer.HitWallJumpPower,
                 1,
-                BaseScript.MasterPlayer.DataPlayer.MarchSpeed,
+                BasePlayer.MasterPlayer.DataPlayer.MarchSpeed,
                 false
             )
             .SetRelative(true)
@@ -140,7 +146,7 @@ namespace Player
                 RoundToInt();
 
                 // 壁に当たって跳ね返るアニメーションのフラグをオン
-                BaseScript.MasterPlayer.PlayerColWallFlag = true;
+                BasePlayer.MasterPlayer.PlayerColWallFlag = true;
             });
         }
 
@@ -150,11 +156,11 @@ namespace Player
             Vector3 tmpPos;
 
             // 位置を矯正
-            tmpPos = BaseScript.MasterPlayer.PlayerObj.transform.localPosition;
-            tmpPos.x = Mathf.RoundToInt(BaseScript.MasterPlayer.BeforeMovePlayerPos.x);
-            tmpPos.y = Mathf.RoundToInt(BaseScript.MasterPlayer.BeforeMovePlayerPos.y);
-            tmpPos.z = Mathf.RoundToInt(BaseScript.MasterPlayer.BeforeMovePlayerPos.z);
-            BaseScript.MasterPlayer.PlayerObj.transform.localPosition = tmpPos;
+            tmpPos = BasePlayer.MasterPlayer.PlayerObj.transform.localPosition;
+            tmpPos.x = Mathf.RoundToInt(BasePlayer.MasterPlayer.BeforeMovePlayerPos.x);
+            tmpPos.y = Mathf.RoundToInt(BasePlayer.MasterPlayer.BeforeMovePlayerPos.y);
+            tmpPos.z = Mathf.RoundToInt(BasePlayer.MasterPlayer.BeforeMovePlayerPos.z);
+            BasePlayer.MasterPlayer.PlayerObj.transform.localPosition = tmpPos;
         }
     }
 }

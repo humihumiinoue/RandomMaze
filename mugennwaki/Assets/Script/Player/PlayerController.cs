@@ -9,11 +9,13 @@ namespace Player
     {
         void Awake()
         {
+            MasterPlayer = this.GetComponent<BasePlayer>();
             DG.Tweening.DOTween.SetTweensCapacity(tweenersCapacity:800, sequencesCapacity:200);
             InstancePlayer = new InstancePlayer();
             MovePlayer = new MovePlayer();
             PlayerRotate = new PlayerRotate();
             ColPlayer = new ColPlayer();
+            PlayerGetItem = new valueObject.PlayerGetItem(0);
             // プレイヤー生成
             InstancePlayer.instancePlayer();
         }
@@ -22,9 +24,9 @@ namespace Player
         void Start()
         {
             // 回転フラグをオン
-            BaseScript.MasterPlayer.PlayerRotateFlag = true;
+            MasterPlayer.PlayerRotateFlag = true;
             // 壁に当たった時のアニメーションを再生するフラグをオン
-            BaseScript.MasterPlayer.PlayerColWallFlag = true;
+            MasterPlayer.PlayerColWallFlag = true;
         }
 
         // Update is called once per frame
